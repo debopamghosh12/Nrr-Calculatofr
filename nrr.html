@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NRR Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0d2e27;
+            --bg-mid: #145445;
+            --card: #f7f9f8;
+            --ink: #15201c;
+            --ink-soft: #5b6a64;
+            --accent: #8ee845;
+            --accent-2: #53cc6f;
+            --line: #dce5e0;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 18px 40px rgba(6, 27, 21, 0.18);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Barlow", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 20% 0%, rgba(142, 232, 69, 0.2), transparent 32%),
+                radial-gradient(circle at 90% 10%, rgba(83, 204, 111, 0.18), transparent 25%),
+                linear-gradient(145deg, var(--bg-deep), var(--bg-mid));
+            padding: 24px 14px;
+        }
+
+        .app {
+            max-width: 1100px;
+            margin: 0 auto;
+            border-radius: 28px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #f4f7f6 0%, #f8faf9 100%);
+            box-shadow: var(--shadow);
+        }
+
+        .topbar {
+            background:
+                linear-gradient(0deg, rgba(16, 47, 41, 0.95), rgba(16, 47, 41, 0.95)),
+                repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.04) 1px, transparent 1px, transparent 18px);
+            color: #e8f5ee;
+            padding: 20px 20px 16px;
+        }
+
+        .top-row,
+        .user-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: "Rajdhani", sans-serif;
+            letter-spacing: 0.6px;
+            font-size: 2rem;
+            margin: 0;
+            color: #f0fff7;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #fff;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .user-row {
+            margin-top: 10px;
+            color: #ddede6;
+        }
+
+        .user-row strong {
+            color: #ffffff;
+        }
+
+        .content {
+            padding: 16px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 18px;
+            overflow-x: auto;
+            margin-bottom: 14px;
+            padding-bottom: 4px;
+        }
+
+        .tab {
+            white-space: nowrap;
+            color: #657670;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding-bottom: 6px;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            color: var(--ink);
+            border-bottom-color: var(--accent-2);
+        }
+
+        .nrr-section {
+            border-radius: var(--radius-lg);
+            background: #ffffff;
+            border: 1px solid var(--line);
+            padding: 16px;
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .section-head h2 {
+            margin: 0;
+            font-family: "Rajdhani", sans-serif;
+            letter-spacing: 0.3px;
+            font-size: 1.4rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: rgba(0, 0, 0, 0.1);
+            color: #0f4f37;
+        }
+
+        .controls {
+            border-radius: var(--radius-md);
+            border: 1px solid var(--line);
+            padding: 12px;
+            margin-bottom: 14px;
+            background: #f8faf9;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .control-row label {
+            margin: 0;
+            font-weight: 700;
+            color: #29453c;
+        }
+
+        .control-row select {
+            min-width: 120px;
+            border-radius: var(--radius-sm);
+            border: 1px solid #c6d8cf;
+            padding: 8px;
+            background: #fff;
+            font-weight: 700;
+            color: #1f3f35;
+        }
+
+        .match-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .match-card {
+            border-radius: var(--radius-md);
+            border: 1px solid var(--line);
+            padding: 12px;
+            background: #fcfdfd;
+            animation: floatIn 420ms ease;
+        }
+
+        .match-card h3 {
+            margin: 0 0 8px;
+            font-family: "Rajdhani", sans-serif;
+            letter-spacing: 0.2px;
+            font-size: 1.1rem;
+        }
+
+        .split-title {
+            font-weight: 700;
+            margin: 8px 0 4px;
+            color: #3a4f47;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        label {
+            display: block;
+            margin: 8px 0 4px;
+            font-size: 0.86rem;
+            color: var(--ink-soft);
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            border: 1px solid #cedad4;
+            border-radius: var(--radius-sm);
+            padding: 8px;
+            font-size: 0.92rem;
+            outline: none;
+            transition: border-color 180ms ease, box-shadow 180ms ease;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #50b879;
+            box-shadow: 0 0 0 3px rgba(80, 184, 121, 0.18);
+        }
+
+        .calc-btn {
+            width: 100%;
+            border: 0;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #143126;
+            background: linear-gradient(90deg, var(--accent), #caf849);
+            cursor: pointer;
+            margin-bottom: 14px;
+            transition: transform 160ms ease;
+        }
+
+        .calc-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .results {
+            border-radius: var(--radius-md);
+            background: linear-gradient(180deg, #f0fff6 0%, #ecfff4 100%);
+            border: 1px solid #c6e9d4;
+            padding: 14px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            font-size: 0.98rem;
+        }
+
+        .result-item span {
+            font-weight: 700;
+            color: #0f4f37;
+        }
+
+        .results hr {
+            border: 0;
+            border-top: 1px dashed #b2dcc2;
+            margin: 10px 0;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: #f0f7f5;
+            color: #0f4f37;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .back-link:hover {
+            background: #e0f0eb;
+        }
+
+        .bottom-nav {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            background: #ffffff;
+            border-top: 1px solid #dfebe5;
+            padding: 10px 12px 14px;
+        }
+
+        .nav-item {
+            text-align: center;
+            color: #60706b;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: #2b6a55;
+        }
+
+        .nav-item .dot {
+            display: block;
+            width: 8px;
+            height: 8px;
+            margin: 0 auto 5px;
+            border-radius: 50%;
+            background: #d2ddd8;
+        }
+
+        .nav-item.active .dot {
+            background: var(--accent-2);
+        }
+
+        @keyframes floatIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .app {
+                border-radius: 18px;
+            }
+
+            .section-head {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="app">
+        <header class="topbar">
+            <div class="top-row">
+                <button class="icon-btn" type="button" aria-label="Open menu">☰</button>
+                <h1 class="logo">Hostel Prem<span>ier League 2026</span></h1>
+                <button class="icon-btn" type="button" aria-label="Search">⌕</button>
+            </div>
+            <div class="user-row">
+                <div>Good Morning, <strong>Captain</strong></div>
+                <div>NRR Desk</div>
+            </div>
+        </header>
+
+        <div class="content">
+            <nav class="tabs" aria-label="Tournament sections">
+                <div class="tab" onclick="navigateTo('index.html')">Overview</div>
+                <div class="tab active" onclick="navigateTo('nrr.html')">NRR Calculator</div>
+                <div class="tab" onclick="navigateTo('index.html')">Matches</div>
+                <div class="tab" onclick="navigateTo('points.html')">Points Table</div>
+                <div class="tab" onclick="navigateTo('index.html')">Team Squads</div>
+            </nav>
+
+            <a href="index.html" class="back-link">← Back to Overview</a>
+
+            <section class="nrr-section">
+                <div class="section-head">
+                    <h2>Tournament NRR Calculator</h2>
+                    <span class="badge">Official + Custom</span>
+                </div>
+
+                <div class="controls">
+                    <div class="control-row">
+                        <label for="match-count">Matches Played</label>
+                        <select id="match-count">
+                            <option value="1">1</option>
+                            <option value="2" selected>2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                    <div class="control-row" style="margin-top:10px;">
+                        <label for="runrate-mode">Run Rate Basis</label>
+                        <select id="runrate-mode">
+                            <option value="overs" selected>By Overs (Runs / Overs)</option>
+                            <option value="balls">By Balls (Runs / Balls)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="match-grid" id="matches-container"></div>
+
+                <button class="calc-btn" onclick="calculateNRR()">Calculate NRR</button>
+
+                <div class="results">
+                    <div id="res-match-list" class="match-results"></div>
+                    <hr>
+                    <div class="result-item"><strong>Your Custom Summed NRR</strong> <span id="res-custom">0.000</span></div>
+                    <div class="result-item"><strong>Official Tournament NRR</strong> <span id="res-official">0.000</span></div>
+                </div>
+            </section>
+        </div>
+
+        <footer class="bottom-nav">
+            <div class="nav-item active"><span class="dot"></span>Home</div>
+            <div class="nav-item"><span class="dot"></span>Live</div>
+            <div class="nav-item"><span class="dot"></span>Series</div>
+            <div class="nav-item"><span class="dot"></span>Shorts</div>
+            <div class="nav-item"><span class="dot"></span>More</div>
+        </footer>
+    </main>
+
+    <script>
+        const matchCountSelect = document.getElementById('match-count');
+        const runrateModeSelect = document.getElementById('runrate-mode');
+        const matchesContainer = document.getElementById('matches-container');
+        const matchResultList = document.getElementById('res-match-list');
+
+        function navigateTo(path) {
+            window.location.href = path;
+        }
+
+        function createMatchCard(index) {
+            return `
+                <article class="match-card" id="match${index}">
+                    <h3>Match ${index}</h3>
+                    <div class="split-title">Batting</div>
+                    <label>Runs Scored</label><input type="number" id="m${index}-bat-runs" value="0" min="0">
+                    <label>Overs Faced</label><input type="number" id="m${index}-bat-overs" value="0" min="0">
+                    <label>Balls Faced (0-5)</label><input type="number" id="m${index}-bat-balls" value="0" min="0" max="5">
+
+                    <div class="split-title">Bowling</div>
+                    <label>Runs Conceded</label><input type="number" id="m${index}-bowl-runs" value="0" min="0">
+                    <label>Overs Bowled</label><input type="number" id="m${index}-bowl-overs" value="0" min="0">
+                    <label>Balls Bowled (0-5)</label><input type="number" id="m${index}-bowl-balls" value="0" min="0" max="5">
+                </article>
+            `;
+        }
+
+        function renderMatchCards() {
+            const matchCount = parseInt(matchCountSelect.value, 10);
+            matchesContainer.innerHTML = Array.from(
+                { length: matchCount },
+                (_, i) => createMatchCard(i + 1)
+            ).join('');
+
+            matchResultList.innerHTML = Array.from(
+                { length: matchCount },
+                (_, i) => `<div class="result-item">Match ${i + 1} NRR: <span id="res-m${i + 1}">0.000</span></div>`
+            ).join('');
+        }
+
+        async function calculateNRR() {
+            const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
+            const matchCount = parseInt(matchCountSelect.value, 10);
+            const runRateBasis = runrateModeSelect.value;
+
+            const matches = Array.from({ length: matchCount }, (_, i) => {
+                const index = i + 1;
+                return {
+                    batting: {
+                        runs: getVal(`m${index}-bat-runs`),
+                        overs: getVal(`m${index}-bat-overs`),
+                        balls: getVal(`m${index}-bat-balls`)
+                    },
+                    bowling: {
+                        runs: getVal(`m${index}-bowl-runs`),
+                        overs: getVal(`m${index}-bowl-overs`),
+                        balls: getVal(`m${index}-bowl-balls`)
+                    }
+                };
+            });
+
+            try {
+                const response = await fetch('http://localhost:3000/api/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ matches, runRateBasis })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to calculate NRR');
+                }
+
+                data.matchNRRs.forEach((nrr, i) => {
+                    const node = document.getElementById(`res-m${i + 1}`);
+                    if (node) {
+                        node.textContent = nrr.toFixed(3);
+                    }
+                });
+
+                document.getElementById('res-custom').textContent = data.customSummedNRR.toFixed(3);
+                document.getElementById('res-official').textContent = data.officialCumulativeNRR.toFixed(3);
+            } catch (error) {
+                alert(error.message || 'Error connecting to the backend. Make sure your Node server is running on port 3000!');
+            }
+        }
+
+        matchCountSelect.addEventListener('change', renderMatchCards);
+        renderMatchCards();
+    </script>
+</body>
+</html>

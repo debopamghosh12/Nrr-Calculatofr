@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Admin Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #081f1a;
+            --bg-mid: #0f3e34;
+            --surface: #f7fbf9;
+            --card: #ffffff;
+            --line: #d3e1db;
+            --ink: #163028;
+            --soft: #5a6c65;
+            --accent: #8ee845;
+            --accent-strong: #58c47b;
+            --danger: #c6374d;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Barlow", sans-serif;
+            background:
+                radial-gradient(circle at 10% 0%, rgba(142, 232, 69, 0.2), transparent 35%),
+                linear-gradient(135deg, var(--bg-deep), var(--bg-mid));
+            color: var(--ink);
+            padding: 20px 12px;
+        }
+
+        .shell {
+            max-width: 980px;
+            margin: 0 auto;
+            background: var(--surface);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 24px 45px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            padding: 18px;
+            color: #eefaf4;
+            background: linear-gradient(160deg, #113a31, #0d2e27);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-family: "Rajdhani", sans-serif;
+            font-size: 1.9rem;
+            letter-spacing: 0.4px;
+        }
+
+        .header p {
+            margin: 4px 0 0;
+            color: #c3dfd4;
+            font-size: 0.92rem;
+        }
+
+        .wrap { padding: 14px; }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        h2 {
+            margin: 0 0 8px;
+            font-family: "Rajdhani", sans-serif;
+            font-size: 1.35rem;
+        }
+
+        h3 {
+            margin: 0 0 8px;
+            font-size: 1.02rem;
+        }
+
+        label {
+            display: block;
+            margin: 8px 0 4px;
+            color: var(--soft);
+            font-weight: 600;
+            font-size: 0.88rem;
+        }
+
+        input {
+            width: 100%;
+            border-radius: 9px;
+            border: 1px solid #c5d7cf;
+            padding: 9px;
+            font-size: 0.94rem;
+            background: #fff;
+        }
+
+        select {
+            width: 100%;
+            border-radius: 9px;
+            border: 1px solid #c5d7cf;
+            padding: 9px;
+            font-size: 0.94rem;
+            background: #fff;
+        }
+
+        input:focus {
+            border-color: var(--accent-strong);
+            box-shadow: 0 0 0 3px rgba(88, 196, 123, 0.18);
+            outline: none;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 9px;
+            padding: 9px 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            color: #143126;
+            background: linear-gradient(90deg, var(--accent), #caf849);
+        }
+
+        .btn-secondary {
+            color: #1f4035;
+            border: 1px solid #b6ccc2;
+            background: #fff;
+        }
+
+        .btn-danger {
+            color: #fff;
+            background: var(--danger);
+        }
+
+        .hidden { display: none; }
+
+        .status {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #37584d;
+        }
+
+        .status.error {
+            color: #ab1f3b;
+        }
+
+        .preview {
+            border-radius: var(--radius-md);
+            border: 1px dashed #bfd5ca;
+            padding: 10px;
+            background: #f9fdfb;
+            margin-top: 10px;
+        }
+
+        .preview-item {
+            padding: 6px 0;
+            border-top: 1px dashed #dbe8e2;
+        }
+
+        .preview-item:first-child {
+            border-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <header class="header">
+            <h1>Admin Console</h1>
+            <p>Manage tournament cards, fixtures, results, and stats for public display.</p>
+        </header>
+
+        <div class="wrap">
+            <section class="card" id="login-card">
+                <h2>Secure Login</h2>
+                <div class="grid">
+                    <div>
+                        <label for="admin-id">Admin ID</label>
+                        <input id="admin-id" type="text" placeholder="Enter admin ID">
+                    </div>
+                    <div>
+                        <label for="admin-pass">Password</label>
+                        <input id="admin-pass" type="password" placeholder="Enter password">
+                    </div>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" type="button" onclick="loginAdmin()">Login</button>
+                </div>
+                <p id="login-status" class="status">Use your admin credentials to unlock controls.</p>
+            </section>
+
+            <section class="card hidden" id="admin-card">
+                <h2>Tournament Content Manager</h2>
+
+                <div class="grid">
+                    <article>
+                        <h3>Header</h3>
+                        <label for="admin-title">Tournament Name</label>
+                        <input id="admin-title" type="text">
+                        <label for="admin-badge">Badge Text</label>
+                        <input id="admin-badge" type="text">
+                        <label for="admin-description">Subtitle</label>
+                        <input id="admin-description" type="text">
+                    </article>
+
+                    <article>
+                        <h3>Add Fixture</h3>
+                        <label for="fx-team-a">Team A</label>
+                        <input id="fx-team-a" type="text" placeholder="Team A">
+                        <label for="fx-team-b">Team B</label>
+                        <input id="fx-team-b" type="text" placeholder="Team B">
+                        <label for="fx-state">Status</label>
+                        <input id="fx-state" type="text" placeholder="Today / Live / Scheduled">
+                        <div class="actions">
+                            <button class="btn btn-secondary" type="button" onclick="addFixture()">Add Fixture</button>
+                            <button class="btn btn-danger" type="button" onclick="clearFixtures()">Clear</button>
+                        </div>
+                    </article>
+
+                    <article>
+                        <h3>Add Result</h3>
+                        <label for="rs-summary">Score Summary</label>
+                        <input id="rs-summary" type="text" placeholder="India 228-5">
+                        <label for="rs-outcome">Outcome</label>
+                        <input id="rs-outcome" type="text" placeholder="Won / Lost / Finished">
+                        <div class="actions">
+                            <button class="btn btn-secondary" type="button" onclick="addResult()">Add Result</button>
+                            <button class="btn btn-danger" type="button" onclick="clearResults()">Clear</button>
+                        </div>
+                    </article>
+
+                    <article>
+                        <h3>Add Stat</h3>
+                        <label for="st-label">Label</label>
+                        <input id="st-label" type="text" placeholder="Teams">
+                        <label for="st-value">Value</label>
+                        <input id="st-value" type="text" placeholder="8">
+                        <div class="actions">
+                            <button class="btn btn-secondary" type="button" onclick="addStat()">Add Stat</button>
+                            <button class="btn btn-danger" type="button" onclick="clearStats()">Clear</button>
+                        </div>
+                    </article>
+
+                    <article>
+                        <h3>Add Match To Points Table</h3>
+                        <label for="pt-team-a">Team A</label>
+                        <input id="pt-team-a" type="text" placeholder="Hostel A">
+                        <label for="pt-team-a-runs">Team A Runs/Overs/Balls</label>
+                        <input id="pt-team-a-runs" type="number" min="0" placeholder="Runs">
+                        <div class="grid" style="grid-template-columns: 1fr 1fr; gap:8px;">
+                            <input id="pt-team-a-overs" type="number" min="0" placeholder="Overs">
+                            <input id="pt-team-a-balls" type="number" min="0" max="5" placeholder="Balls">
+                        </div>
+
+                        <label for="pt-team-b">Team B</label>
+                        <input id="pt-team-b" type="text" placeholder="Hostel B">
+                        <label for="pt-team-b-runs">Team B Runs/Overs/Balls</label>
+                        <input id="pt-team-b-runs" type="number" min="0" placeholder="Runs">
+                        <div class="grid" style="grid-template-columns: 1fr 1fr; gap:8px;">
+                            <input id="pt-team-b-overs" type="number" min="0" placeholder="Overs">
+                            <input id="pt-team-b-balls" type="number" min="0" max="5" placeholder="Balls">
+                        </div>
+
+                        <label for="pt-result-type">Result Type</label>
+                        <select id="pt-result-type">
+                            <option value="normal" selected>Normal</option>
+                            <option value="tie">Tie</option>
+                            <option value="no_result">No Result</option>
+                        </select>
+
+                        <label for="pt-winner">Winner Team Name (optional)</label>
+                        <input id="pt-winner" type="text" placeholder="Leave empty to auto-pick by runs">
+
+                        <div class="actions">
+                            <button class="btn btn-secondary" type="button" onclick="submitPointsMatch()">Store Match In Neon</button>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" type="button" onclick="saveAdminData()">Save & Publish</button>
+                </div>
+                <p id="admin-status" class="status">No changes published yet.</p>
+
+                <div class="preview">
+                    <strong>Current Draft</strong>
+                    <div id="preview-fixtures"></div>
+                    <div id="preview-results"></div>
+                    <div id="preview-stats"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const loginCard = document.getElementById('login-card');
+        const adminCard = document.getElementById('admin-card');
+        const loginStatus = document.getElementById('login-status');
+        const adminStatus = document.getElementById('admin-status');
+        const previewFixtures = document.getElementById('preview-fixtures');
+        const previewResults = document.getElementById('preview-results');
+        const previewStats = document.getElementById('preview-stats');
+
+        const tournamentState = {
+            tournamentName: 'Hostel Premier League 2026',
+            badgeText: 'LIVE',
+            description: 'Track fixtures and estimate your NRR impact match-by-match.',
+            fixtures: [],
+            results: [],
+            stats: []
+        };
+
+        let adminToken = '';
+
+        function setLoginStatus(message, isError = false) {
+            loginStatus.textContent = message;
+            loginStatus.className = isError ? 'status error' : 'status';
+        }
+
+        function setAdminStatus(message, isError = false) {
+            adminStatus.textContent = message;
+            adminStatus.className = isError ? 'status error' : 'status';
+        }
+
+        function renderDraftPreview() {
+            previewFixtures.innerHTML = tournamentState.fixtures.length
+                ? '<div class="preview-item"><strong>Fixtures:</strong> ' + tournamentState.fixtures.map((item) => `${item.teamA} vs ${item.teamB} (${item.state})`).join(' | ') + '</div>'
+                : '<div class="preview-item"><strong>Fixtures:</strong> none</div>';
+
+            previewResults.innerHTML = tournamentState.results.length
+                ? '<div class="preview-item"><strong>Results:</strong> ' + tournamentState.results.map((item) => `${item.summary} (${item.outcome})`).join(' | ') + '</div>'
+                : '<div class="preview-item"><strong>Results:</strong> none</div>';
+
+            previewStats.innerHTML = tournamentState.stats.length
+                ? '<div class="preview-item"><strong>Stats:</strong> ' + tournamentState.stats.map((item) => `${item.label}: ${item.value}`).join(' | ') + '</div>'
+                : '<div class="preview-item"><strong>Stats:</strong> none</div>';
+        }
+
+        function hydrateHeaderFields() {
+            document.getElementById('admin-title').value = tournamentState.tournamentName;
+            document.getElementById('admin-badge').value = tournamentState.badgeText;
+            document.getElementById('admin-description').value = tournamentState.description;
+        }
+
+        async function loadTournamentData() {
+            try {
+                const response = await fetch('http://localhost:3000/api/tournament-data');
+                const data = await response.json();
+
+                Object.assign(tournamentState, {
+                    tournamentName: data.tournamentName || tournamentState.tournamentName,
+                    badgeText: data.badgeText || tournamentState.badgeText,
+                    description: data.description || tournamentState.description,
+                    fixtures: Array.isArray(data.fixtures) ? data.fixtures : [],
+                    results: Array.isArray(data.results) ? data.results : [],
+                    stats: Array.isArray(data.stats) ? data.stats : []
+                });
+
+                hydrateHeaderFields();
+                renderDraftPreview();
+            } catch (_error) {
+                setLoginStatus('Could not load tournament data. Check server status.', true);
+            }
+        }
+
+        async function loginAdmin() {
+            const adminId = document.getElementById('admin-id').value.trim();
+            const adminPass = document.getElementById('admin-pass').value;
+
+            if (!adminId || !adminPass) {
+                setLoginStatus('Admin ID and password are required.', true);
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/admin-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminId, adminPass })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Invalid credentials');
+                }
+
+                adminToken = data.token;
+                loginCard.classList.add('hidden');
+                adminCard.classList.remove('hidden');
+                setLoginStatus('Authenticated.');
+                setAdminStatus('Login successful. You can now publish updates.');
+                await loadTournamentData();
+            } catch (error) {
+                setLoginStatus(error.message || 'Login failed.', true);
+            }
+        }
+
+        function addFixture() {
+            const teamA = document.getElementById('fx-team-a').value.trim();
+            const teamB = document.getElementById('fx-team-b').value.trim();
+            const state = document.getElementById('fx-state').value.trim() || 'Scheduled';
+
+            if (!teamA || !teamB) {
+                setAdminStatus('Fixture requires Team A and Team B.', true);
+                return;
+            }
+
+            tournamentState.fixtures.push({ teamA, teamB, state });
+            document.getElementById('fx-team-a').value = '';
+            document.getElementById('fx-team-b').value = '';
+            document.getElementById('fx-state').value = '';
+            renderDraftPreview();
+            setAdminStatus('Fixture added to draft.');
+        }
+
+        function clearFixtures() {
+            tournamentState.fixtures = [];
+            renderDraftPreview();
+            setAdminStatus('Fixture draft cleared.');
+        }
+
+        function addResult() {
+            const summary = document.getElementById('rs-summary').value.trim();
+            const outcome = document.getElementById('rs-outcome').value.trim() || 'Finished';
+
+            if (!summary) {
+                setAdminStatus('Result requires score summary.', true);
+                return;
+            }
+
+            tournamentState.results.push({ summary, outcome });
+            document.getElementById('rs-summary').value = '';
+            document.getElementById('rs-outcome').value = '';
+            renderDraftPreview();
+            setAdminStatus('Result added to draft.');
+        }
+
+        function clearResults() {
+            tournamentState.results = [];
+            renderDraftPreview();
+            setAdminStatus('Result draft cleared.');
+        }
+
+        function addStat() {
+            const label = document.getElementById('st-label').value.trim();
+            const value = document.getElementById('st-value').value.trim();
+
+            if (!label || !value) {
+                setAdminStatus('Stat requires label and value.', true);
+                return;
+            }
+
+            tournamentState.stats.push({ label, value });
+            document.getElementById('st-label').value = '';
+            document.getElementById('st-value').value = '';
+            renderDraftPreview();
+            setAdminStatus('Stat added to draft.');
+        }
+
+        function clearStats() {
+            tournamentState.stats = [];
+            renderDraftPreview();
+            setAdminStatus('Stat draft cleared.');
+        }
+
+        async function saveAdminData() {
+            tournamentState.tournamentName = document.getElementById('admin-title').value.trim() || tournamentState.tournamentName;
+            tournamentState.badgeText = document.getElementById('admin-badge').value.trim() || tournamentState.badgeText;
+            tournamentState.description = document.getElementById('admin-description').value.trim() || tournamentState.description;
+
+            if (!adminToken) {
+                setAdminStatus('Session expired. Login again.', true);
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/tournament-data', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminToken, ...tournamentState })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to save');
+                }
+
+                renderDraftPreview();
+                setAdminStatus('Published successfully. Public page now shows updated content.');
+            } catch (error) {
+                setAdminStatus(error.message || 'Failed to publish changes.', true);
+            }
+        }
+
+        async function submitPointsMatch() {
+            if (!adminToken) {
+                setAdminStatus('Session expired. Login again.', true);
+                return;
+            }
+
+            const payload = {
+                adminToken,
+                teamAName: document.getElementById('pt-team-a').value.trim(),
+                teamBName: document.getElementById('pt-team-b').value.trim(),
+                teamARuns: Number(document.getElementById('pt-team-a-runs').value || 0),
+                teamAOvers: Number(document.getElementById('pt-team-a-overs').value || 0),
+                teamABalls: Number(document.getElementById('pt-team-a-balls').value || 0),
+                teamBRuns: Number(document.getElementById('pt-team-b-runs').value || 0),
+                teamBOvers: Number(document.getElementById('pt-team-b-overs').value || 0),
+                teamBBalls: Number(document.getElementById('pt-team-b-balls').value || 0),
+                resultType: document.getElementById('pt-result-type').value,
+                winnerName: document.getElementById('pt-winner').value.trim()
+            };
+
+            if (!payload.teamAName || !payload.teamBName) {
+                setAdminStatus('Points match requires Team A and Team B names.', true);
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/points-match', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to store match in Neon');
+                }
+
+                setAdminStatus(`Match stored in Neon (ID: ${data.matchId}). Points table is now updated.`);
+            } catch (error) {
+                setAdminStatus(error.message || 'Failed to store Neon match.', true);
+            }
+        }
+
+        loadTournamentData();
+        renderDraftPreview();
+    </script>
+</body>
+</html>
