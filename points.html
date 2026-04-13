@@ -328,7 +328,7 @@
                 basisBadge.textContent = `NRR Basis: Runs / ${basisLabel}`;
                 nrrColHead.textContent = `NRR (${basisLabel})`;
                 setStatus('Loading points table from Neon...');
-                const response = await fetch(`http://localhost:3000/api/points-table?runRateBasis=${selectedBasis}`);
+                const response = await fetch(`/api/points-table?runRateBasis=${selectedBasis}`);
                 const data = await response.json();
 
                 if (!response.ok) {

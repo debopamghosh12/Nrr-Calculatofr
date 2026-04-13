@@ -365,7 +365,7 @@
 
         async function loadTournamentData() {
             try {
-                const response = await fetch('http://localhost:3000/api/tournament-data');
+                const response = await fetch('/api/tournament-data');
                 const data = await response.json();
 
                 Object.assign(tournamentState, {
@@ -394,7 +394,7 @@
             }
 
             try {
-                const response = await fetch('http://localhost:3000/api/admin-login', {
+                const response = await fetch('/api/admin-login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ adminId, adminPass })
@@ -495,7 +495,7 @@
             }
 
             try {
-                const response = await fetch('http://localhost:3000/api/tournament-data', {
+                const response = await fetch('/api/tournament-data', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ adminToken, ...tournamentState })
@@ -539,7 +539,7 @@
             }
 
             try {
-                const response = await fetch('http://localhost:3000/api/points-match', {
+                const response = await fetch('/api/points-match', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)

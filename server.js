@@ -420,25 +420,36 @@ app.post('/api/points-match', async (req, res) => {
     }
 });
 
-// API Endpoint for calculation
-const matchImpacts = matches.map((match) => {
-    const nrr = calculateMatchNRR(match.batting, match.bowling, runRateBasis);
+app.post('/api/calculate', (req, res) => {
+    const { matches, runRateBasis } = req.body || {};
 
-    // determine result
-    let impact = 0;
-
-    if (match.result === 'win') {
-        impact = nrr;
-    } else if (match.result === 'loss') {
-        impact = -nrr;
-    } else {
-        impact = 0; // tie / no result
+    if (!Array.isArray(matches)) {
+        return res.status(400).json({ error: 'matches must be an array.' });
     }
 
-    return impact;
-});
+    const safeBasis = runRateBasis === 'balls' ? 'balls' : 'overs';
+    const safeMatches = matches.map((match) => ({
+        batting: {
+            runs: Number(match?.batting?.runs) || 0,
+            overs: Number(match?.batting?.overs) || 0,
+            balls: Math.min(5, Math.max(0, Number(match?.batting?.balls) || 0))
+        },
+        bowling: {
+            runs: Number(match?.bowling?.runs) || 0,
+            overs: Number(match?.bowling?.overs) || 0,
+            balls: Math.min(5, Math.max(0, Number(match?.bowling?.balls) || 0))
+        }
+    }));
 
-const customNRR = matchImpacts.reduce((sum, val) => sum + val, 0);
+    const matchNRRs = safeMatches.map((match) => calculateMatchNRR(match.batting, match.bowling, safeBasis));
+    const customSummedNRR = matchNRRs.reduce((sum, value) => sum + value, 0);
+
+    return res.json({
+        matchNRRs,
+        customSummedNRR,
+        officialCumulativeNRR: customSummedNRR
+    });
+});
 
 const startServer = async () => {
     try {
@@ -452,4 +463,14 @@ const startServer = async () => {
     });
 };
 
-startServer();
+if (process.env.VERCEL) {
+    initializeDatabase().catch((error) => {
+        console.error(`Database initialization skipped/failed: ${error.message}`);
+    });
+}
+
+if (require.main === module) {
+    startServer();
+}
+
+module.exports = app;

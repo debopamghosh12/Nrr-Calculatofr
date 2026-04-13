@@ -571,7 +571,7 @@
 
         async function loadTournamentData() {
             try {
-                const response = await fetch('http://localhost:3000/api/tournament-data');
+                const response = await fetch('/api/tournament-data');
                 const data = await response.json();
 
                 Object.assign(tournamentState, {
